@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuton Tracker UT - Manajemen S1 🌸</title>
+    <style>
+        :root {
+            --bg-color: #fff5f8;
+            --card-bg: #ffffff;
+            --primary-pink: #ffb6c1;
+            --accent-pink: #ff69b4;
+            --dark-pink: #5b1e31;
+            --border-color: #fce4ec;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            background: linear-gradient(135deg, #ffe4e1, #fff0f5);
+            padding: 15px;
+            border-radius: 20px;
+            border: 2px solid var(--primary-pink);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);
+        }
+
+        h1 {
+            color: var(--dark-pink);
+            font-size: 18px;
+            margin: 0 0 5px 0;
+        }
+
+        p.subtitle {
+            color: #8b4513;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .dashboard {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .dashboard h2 {
+            font-size: 14px;
+            color: var(--dark-pink);
+            margin: 0 0 10px 0;
+        }
+
+        .progress-bar-bg {
+            background-color: #ffe6ea;
+            border-radius: 10px;
+            height: 20px;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #ffb6c1, #ff69b4);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-weight: bold;
+            color: var(--accent-pink);
+            font-size: 16px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .course-title {
+            font-weight: bold;
+            color: var(--dark-pink);
+            font-size: 14px;
+        }
+
+        .course-badge {
+            background-color: var(--bg-color);
+            color: var(--accent-pink);
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .session-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed #f5f5f5;
+            font-size: 13px;
+        }
+
+        .session-name {
+            width: 60px;
+            font-weight: 500;
+        }
+
+        .checkboxes {
+            display: flex;
+            gap: 12px;
+        }
+
+        label.check-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--accent-pink);
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🌸 TUTON TRACKER UT 🌸</h1>
+        <p class="subtitle">Manajemen Semester 1 — Simpan Otomatis di HP Kamu!</p>
+    </header>
+
+    <div class="dashboard">
+        <h2>📊 TOTAL PROGRESS SAYA</h2>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="total-progress-bar"></div>
+        </div>
+        <div class="progress-text" id="total-progress-text">0% Completed</div>
+    </div>
+
+    <div id="courses-container"></div>
+</div>
+
+<script>
+    const courses = [
+        { code: "EKMA4116", name: "Pengantar Bisnis (3 SKS)" },
+        { code: "EKMA4111", name: "Pengantar Akuntansi (3 SKS)" },
+        { code: "ESPA4122", name: "Matematika Ekonomi (3 SKS)" },
+        { code: "MKWU4101", name: "Pendidikan Pancasila (2 SKS)" },
+        { code: "MKWI4201", name: "Bahasa Indonesia (2 SKS)" },
+        { code: "MKWU4108", name: "Bahasa Inggris (2 SKS)" }
+    ];
+
+    function renderTracker() {
+        const container = document.getElementById("courses-container");
+        container.innerHTML = "";
+
+        courses.forEach((course, cIdx) => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            let sessionsHTML = "";
+            for (let s = 1; s <= 8; s++) {
+                const hasTask = [3, 5, 7].includes(s);
+                const taskNum = s === 3 ? 1 : (s === 5 ? 2 : 3);
+
+                const absId = `c${cIdx}_s${s}_abs`;
+                const diskId = `c${cIdx}_s${s}_disk`;
+                const tgsId = `c${cIdx}_s${s}_tgs`;
+
+                const absChecked = localStorage.getItem(absId) === "true" ? "checked" : "";
+                const diskChecked = localStorage.getItem(diskId) === "true" ? "checked" : "";
+                const tgsChecked = localStorage.getItem(tgsId) === "true" ? "checked" : "";
+
+                sessionsHTML += `
+                    <div class="session-row">
+                        <span class="session-name">Sesi ${s}</span>
+                        <div class="checkboxes">
+                            <label class="check-item">
+                                <input type="checkbox" id="${absId}" ${absChecked} onchange="saveData('${absId}')"> Absen
+                            </label>
+                            <label class="check-item">
+                                <input type="checkbox" id="${diskId}" ${diskChecked} onchange="saveData('${diskId}')"> Diskusi
+                            </label>
+                            ${hasTask ? `
+                            <label class="check-item" style="color: var(--accent-pink); font-weight: bold;">
+                                <input type="checkbox" id="${tgsId}" ${tgsChecked} onchange="saveData('${tgsId}')"> Tugas ${taskNum}
+                            </label>` : '<span style="width: 55px;"></span>'}
+                        </div>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="course-title">🎀 ${course.code}</span>
+                    <span class="course-badge">${course.name}</span>
+                </div>
+                ${sessionsHTML}
+            `;
+            container.appendChild(card);
+        });
+
+        updateProgress();
+    }
+
+    function saveData(id) {
+        const checkbox = document.getElementById(id);
+        localStorage.setItem(id, checkbox.checked);
+        updateProgress();
+    }
+
+    function updateProgress() {
+        let totalItems = 0;
+        let checkedItems = 0;
+
+        courses.forEach((_, cIdx) => {
+            for (let s = 1; s <= 8; s++) {
+                totalItems += 2; // Absen & Diskusi
+                if (localStorage.getItem(`c${cIdx}_s${s}_abs`) === "true") checkedItems++;
+                if (localStorage.getItem(`c${cIdx}_s${s}_disk`) === "true") checkedItems++;
+
+                if ([3, 5, 7].includes(s)) {
+                    totalItems += 1; // Tugas
+                    if (localStorage.getItem(`c${cIdx}_s${s}_tgs`) === "true") checkedItems++;
+                }
+            }
+        });
+
+        const percent = Math.round((checkedItems / totalItems) * 100);
+        document.getElementById("total-progress-bar").style.width = percent + "%";
+        document.getElementById("total-progress-text").innerText = percent + "% Completed";
+    }
+
+    renderTracker();
+</script>
+
+</body>
+</html>
